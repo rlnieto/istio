@@ -11,7 +11,7 @@ metadata:
 spec:
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: istio-ingressgateway
+    namespace: istio-ingress
   project: default
   syncPolicy:
     automated:
@@ -21,7 +21,7 @@ spec:
       - ApplyOutOfSyncOnly=true
       - CreateNamespace=true
   source:
-    repoURL: http://github.com/rlnieto/istio.git
+    repoURL: http://papandujo.tia.com:3000/rlnieto/istio.git
     targetRevision: main
-    path: service-mesh-deployments/v3-gw-api/helm-charts/istio-ingressgateway
+    path: basic-deployment/v3-gw-api/helm-charts/istio-ingressgateway
        

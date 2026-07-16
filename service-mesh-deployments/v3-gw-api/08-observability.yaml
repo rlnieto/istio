@@ -23,5 +23,5 @@ spec:
   source:
     repoURL: http://github.com/rlnieto/istio.git
     targetRevision: main
-    path: service-mesh-deployments/v3-gw-api/helm-charts/observability
+    path: service-mesh-deployments/v3-gw-api/helm-charts/observability    
        

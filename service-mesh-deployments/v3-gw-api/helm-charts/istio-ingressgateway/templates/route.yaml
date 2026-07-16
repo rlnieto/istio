@@ -7,10 +7,11 @@ metadata:
 spec:
   host: "{{ .Values.istioIngressGateway.hostname }}"
   port:
-    targetPort: http2
+    targetPort: http
   to:
     kind: Service
-    # Format: <gateway_name>-<gateway_class>
+    # The service is created automatically by istio with the name:
+    #   <gateway_name>-<gateway_class>
     name: {{ .Values.istioIngressGateway.name }}-istio
     weight: 100
   wildcardPolicy: None

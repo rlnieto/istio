@@ -3,8 +3,9 @@
 # Genera tráfico en el mesh llamando a los endpoints:
 #   - /productpage
 #   - /api/v1/products
+HOSTNAME=bookinfo.rabadillo.tia.com
 
-HOSTNAME=rabadillo.tia.com
+echo -e "Usando hostname: $HOSTNAME\n"
 
 # Comprobar que se ha pasado un argumento
 if [ $# -ne 1 ]; then
@@ -28,10 +29,12 @@ fi
 
 # Bucle
 for ((i=1; i<=ITERACIONES; i++)); do
-  echo "Iteración $i"
-  curl -s http://$HOSTNAME/productpage > /dev/null
+  echo -n "Iteración $i... "
+#  curl -s http://$HOSTNAME/productpage > /dev/null
+  http_code_page=$(curl -sk -w "%{http_code}" -o /dev/null http://$HOSTNAME/productpage)
   sleep 0.5
-  curl -s http://$HOSTNAME/api/v1/products > /dev/null
+  http_code_json=$(curl -sk -w "%{http_code}" -o /dev/null http://$HOSTNAME/api/v1/products)
+  echo -e "(${http_code_page}/${http_code_json})"
 done
 
 echo "Ejecución completada."

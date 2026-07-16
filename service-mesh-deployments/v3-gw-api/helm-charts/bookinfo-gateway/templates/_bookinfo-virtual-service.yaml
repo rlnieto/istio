@@ -1,13 +1,13 @@
 apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
-  name: {{ .Values.bookInfoGateway.vsName }}
-  namespace: {{ .Values.bookInfoGateway.namespace }}
+  name: {{ .Values.bookinfo.virtualService.name }}
+  namespace: {{ .Values.bookinfo.virtualService.namespace }}
 spec:
   hosts:
   - "*"
   gateways:
-  - {{ .Values.bookInfoGateway.name }}
+  - {{ .Values.bookinfo.gateway.namespace }}/{{ .Values.bookinfo.gateway.name }}
   http:
   - match:
     - uri:
