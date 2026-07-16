@@ -1,0 +1,10 @@
+# Para forzar el uso de podman en lugar de docker
+# Elimina esto si usas docker
+export KIND_EXPERIMENTAL_PROVIDER=podman
+
+# Nombre del cluster
+export CLUSTER_NAME=istio-demo
+
+# Puerto para el nodeport del ingress
+# Tenemos que mapear este puerto en el contenedor de kind
+export INGRESS_NODEPORT=32040

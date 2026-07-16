@@ -1,0 +1,10 @@
+# Configuramos Prometheus como metrics provider
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: enable-prometheus-metrics
+  namespace: {{ .Values.istio.namespace }}
+spec:
+  metrics:
+  - providers:
+    - name: prometheus

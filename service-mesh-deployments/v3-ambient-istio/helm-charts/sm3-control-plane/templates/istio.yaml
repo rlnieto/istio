@@ -1,0 +1,64 @@
+apiVersion: sailoperator.io/v1
+kind: Istio
+metadata:
+  name: {{ .Values.istio.name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"  
+spec:
+  # Ambient mode enabled
+  profile: ambient
+  namespace: {{ .Values.istio.namespace }}
+  # Defines how the operator updates the control plane:
+  #   - InPlace (recommended)
+  #   - RevisioBased
+  updateStrategy:
+    type: InPlace
+    inactiveRevisionDeletionGracePeriodSeconds: 30
+  values:
+    pilot:
+      # Ztunnel namespace
+      trustedZtunnelNamespace: {{ .Values.istio.ztunnel.namespace }}
+      autoscaleEnabled: false
+      replicaCount: {{ .Values.istio.pilot.replicas }}
+    meshConfig:
+      # Ejemplo de cómo añadir el certificado de una CA
+      # OJO: este certificado solo se usa en las comunicaciones dentro 
+      # de la mesh
+      caCertificates:
+      - pem: |
+          -----BEGIN CERTIFICATE-----
+          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
+          8uM+kHtjf25w
+          -----END CERTIFICATE-----
+      enableAutoMtls: false
+      # Esta es la etiqueta que tenemos que añadir a los ns
+      # en los que queremos que sean monitorizados por istio
+      discoverySelectors:
+        - matchLabels:
+            istio-discovery: enabled

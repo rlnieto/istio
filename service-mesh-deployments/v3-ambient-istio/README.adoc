@@ -1,0 +1,109 @@
+:icons: font
+:source-highlighter: highlightjs
+:highlightjs-theme: monokai
+//:source-highlighter: rouge
+:sectnums:
+:toc:
+:toclevels: 4
+
+== Service mesh 3
+Pasos para desplegar service mesh 3 y la aplicación:
+
+* Instalar los operadores
+* Desplegar el control plane
+* Añadir los namespaces que van a ser gestionados por Istio
+* Desplegar la aplicación *bookinfo*
+* Crear y configurar un gateway para acceder a la aplicación *bookinfo*
+
+=== Instalación
+==== Instalación de los operadores
+
+[cols="1,1"]
+|===
+| Operador | ArgoCD manifest
+
+| Service mesh 3 
+| *__01-service-mesh-3-operator.yaml__*
+
+| Kiali
+| *__02-kiali-operator.yaml__*
+
+| OpenTelemetry
+| *__03-otel-operator.yaml__*
+
+|===
+
+
+[NOTE]
+Si hemos instalado y desinstalado service mesh 2 previamente y la instalación del operador de service mesh 3 se queda parada tenemos que borrar todos los crd de sailoperator previos
+
+==== Despliegue del control plane
+Desplegamos el manifest *__04-control-plane.yaml__* de ArgoCD. Esto creará los objetos *Istio* (ns istio-system) e *IstioCNI* (ns istio-cni). Además se creará automáticamente el objeto *IstioRevision* (ns istio-system)
+
+Se creará un objeto de tipo *ZTunnel* en el namespace *ztunnel* que levantará un daemonset encargado de gestionar los pods con el Envoy a nivel de nodo. Se creará también un pod monitor para extraer las métricas relevantes del ZTunnel
+
+Además se ha añadido dos propiedades al recurso *Istio* para usar el ambient mode:
+[source, yaml]
+----
+spec:
+  # Ambient mode enabled
+  profile: ambient
+  values:
+    pilot:
+      # Ztunnel namespace
+      trustedZtunnelNamespace: {{ .Values.istio.ztunnel.namespace }}
+----
+
+=== Desplegar la aplicación 'bookinfo'
+Desplegamos el manifest *__05-bookinginfo-application.yaml__* que:
+
+* Crea el namespace *bookinfo* y le añade las anotaciones necesarias para que forme parte del mesh
++
+[source, yaml]
+----
+  labels:
+    istio-discovery: enabled
+    istio.io/dataplane-mode: ambient
+----
+
+* Despliega la aplicación de ejemplo https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml[bookinfo]
+
+[WARNING]
+====
+Si el objeto Istio no se llama *default* las anotaciones añadidas al namespace no van a funcionar. Si le hemos cambiado el nombre en lugar de usar la label *__istio-injection=enabled__* en el namespace donde queremos inyectar los sidecar tenemos que usar esta otra:
+[source, java]
+----
+istio.io/rev=<nombre_cr_istio>
+----
+====
+
+=== Crear y configurar un gateway
+En service mesh 3 los ingress/egress no se crean desde el control plane sino mediante un deployment. Para ello se usa el manifest *__06-istio-ingress-gateway.yaml__*:
+
+* Crea el namespace *istio-ingress*
+* Despliega el ingress gateway de istio
+
+Se creará también una ruta para acceder al ingress de istio usando el hostname que se se indique en el values del chart *istio-ingressgateway* (por defecto *__bookinfo.<cluster-hostname>__*)
+
+Una vez desplegado el ingress creamos el gateway para la aplicación *bookinfo* (que configura el ingress gateway de istio mencionado antes) aplicando el manifest *__07-bookinfo-gateway.yaml__*. El gateway para la aplicación *bookinfo* se creará el namespace en el que está el ingress (*istio-ingress* por defecto)
+
+[NOTE]
+Cuando creamos el ingress gateway en un namespace diferente del usado para istio (normalmente *istio-system*) tenemos que añadir al nuevo namespace la label para que istiod lo monitorice (si no lo hacemos no se creará el configmap con los certificados necesarios en el namespace del ingress gateway)
+
+Comprobamos que podemos acceder a la aplicación:
+[source, bash]
+----
+curl -sk http://bookinfo.<cluster-hostname>/api/v1/products | jq
+----
+
+== Observabilidad
+Aplicamos manifest de argo *__08-observability.yaml__*, que:
+
+* Crea una instancia de Kiali
+* Configura Prometheus como proveedor de métricas
+* Habilita la monitorización de cargas de usuario
+
+Lanzamos el script *utils/generate-traffic.sh* para generar tráfico y comprobamos que podemos verlo en Kiali:
+
+image::images/trafico-kiali.png[]
+

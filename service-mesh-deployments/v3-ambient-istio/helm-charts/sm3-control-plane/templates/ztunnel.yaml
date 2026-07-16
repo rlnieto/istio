@@ -1,0 +1,8 @@
+apiVersion: sailoperator.io/v1
+kind: ZTunnel
+metadata:
+  name: default
+  labels:
+    istio-discovery: enabled
+spec:
+  namespace: {{ .Values.istio.ztunnel.namespace }}

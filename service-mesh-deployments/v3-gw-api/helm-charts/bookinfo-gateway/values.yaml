@@ -1,0 +1,4 @@
+bookInfoGateway:
+  name: bookinfo-gateway
+  vsName: bookinfo-vs
+  namespace: bookinfo

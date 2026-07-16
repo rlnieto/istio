@@ -1,0 +1,37 @@
+# Configuramos un gateway genérico para todo el cluster kind (*.kind.mortadelo.tia.com)
+# y un virtual service para la consola web de headlamp (headlamp.kind.motadelo.tia.com)
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: default-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      # Este es el puerto del servicio asociado al ingress, no el 
+      # puerto que se usa desde el host
+      number: 80
+      name: http2
+      protocol: HTTP
+    hosts:
+    - '*'
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: headlamp
+  namespace: headlamp
+spec:
+  hosts:
+  - '*'
+  gateways:
+  # Si el gateway está en otro ns lo añadimos al nombre del gateway
+  - istio-system/default-gateway
+  http:
+  - route:
+    - destination:
+        host: headlamp.headlamp.svc.cluster.local
+        port:
+          number: 80

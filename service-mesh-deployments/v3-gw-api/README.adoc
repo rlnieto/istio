@@ -1,0 +1,104 @@
+:icons: font
+:source-highlighter: highlightjs
+:highlightjs-theme: monokai
+//:source-highlighter: rouge
+:sectnums:
+:toc:
+:toclevels: 4
+
+== Service mesh 3
+Pasos para desplegar service mesh 3 y la aplicación:
+
+* Instalar los operadores
+* Desplegar el control plane
+* Añadir los namespaces que van a ser gestionados por Istio
+* Desplegar la aplicación *bookinfo*
+* Crear y configurar un gateway para acceder a la aplicación *bookinfo*
+
+=== Instalación
+==== Instalación de los operadores
+
+[cols="1,1"]
+|===
+| Operador | ArgoCD manifest
+
+| Service mesh 3 
+| *__01-service-mesh-3-operator.yaml__*
+
+| Kiali
+| *__02-kiali-operator.yaml__*
+
+| OpenTelemetry
+| *__03-otel-operator.yaml__*
+
+|===
+
+
+[NOTE]
+Si hemos instalado y desinstalado service mesh 2 previamente y la instalación del operador de service mesh 3 se queda parada tenemos que borrar todos los crd de sailoperator previos
+
+==== Despliegue del control plane
+Desplegamos el manifest *__04-control-plane.yaml__* de ArgoCD. Esto creará los objetos *Istio* (ns istio-system) e *IstioCNI* (ns istio-cni). Además se creará automáticamente el objeto *IstioRevision* (ns istio-system)
+
+=== Desplegar la aplicación 'bookinfo'
+Desplegamos el manifest *__05-bookinginfo-application.yaml__* que:
+
+* Crea el namespace *bookinfo* y le añade las anotaciones necesarias para que forme parte del mesh
++
+[source, yaml]
+----
+  labels:
+    istio-discovery: enabled
+    istio-injection: enabled
+----
+
+* Despliega la aplicación de ejemplo https://raw.githubusercontent.com/openshift-service-mesh/istio/release-1.24/samples/bookinfo/platform/kube/bookinfo.yaml[bookinfo]
+
+* Crea un pod monitor para extraer las métricas de los sidecars 
+
+
+[WARNING]
+====
+Si el objeto Istio no se llama *default* las anotaciones añadidas al namespace no van a funcionar. Si le hemos cambiado el nombre en lugar de usar la label *__istio-injection=enabled__* en el namespace donde queremos inyectar los sidecar tenemos que usar esta otra:
+[source, java]
+----
+istio.io/rev=<nombre_cr_istio>
+----
+====
+
+=== Crear y configurar un gateway
+Por defecto el ingress gateway de istio no se crea y tenemos que crearlo manualmente usando el manifest *__06-istio-ingress-gateway.yaml__*:
+
+* Crea el namespace *istio-ingressgateway*
+* Despliega el ingress gateway de istio
+
+Se creará también una ruta para acceder al ingress de istio usando el hostname que se se indique en el values del chart *istio-ingressgateway* (por defecto *__bookinfo.<cluster-hostname>__*)
+
+* *Gateway para la aplicación (usará el istio ingress gateway):* aplicamos el manifest *__07-bookinfo-gateway.yaml__*
+
+[NOTE]
+Si creamos el istio ingress gateway en un namespace diferente del usado para istio (normalmente *istio-system*) tenemos que añadir al nuevo namespace la label para que istiod lo monitorice (si no lo hacemos no se creará el configmap con los certificados necesarios en el namespace del ingress gateway)
+
+Creamos el gateay para la aplicación *bookinfo* en el namespace en el que esté desplegada (*bookinfo* por defecto) aplicando el manifest *__07-bookinfo-gateway.yaml__* 
+
+Comprobamos que podemos acceder a la aplicación:
+[source, bash]
+----
+curl -sk http://bookinfo.<cluster-hostname>/api/v1/products | jq
+----
+
+== Observabilidad [TODO] <- revisar
+Aplicamos manifest de argo *__08-observability.yaml__*, que:
+
+* Crea una instancia de Kiali
+* Configura Prometheus como proveedor de métricas
+* Habilita la monitorización de cargas de usuario
+
+Lanzamos el script *utils/generate-traffic.sh* para generar tráfico y comprobamos que podemos verlo en Kiali:
+
+image::images/trafico-kiali.png[]
+
+
+
+
+

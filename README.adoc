@@ -1,0 +1,9 @@
+Istio utils:
+
+* *istio-kind:* vanilla istio deployment using kind. Includes Headlamp
+
+* *service-mesh-deployments:* service mesh deployments (including the *bookinfo* app):
+** *v3:* service mesh 3 deployment
+** *v3-gw-api:* service mesh 3 deployment in ambient mode (no kubernetes gateway api)
+** *v3-ambient-istio:* service mesh 3 deployment using kubernetes gateway api (no ambient mode)
+

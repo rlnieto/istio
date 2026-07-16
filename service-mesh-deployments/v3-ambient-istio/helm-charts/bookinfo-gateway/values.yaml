@@ -1,0 +1,7 @@
+bookinfo:
+  gateway:
+    name: bookinfo-gateway
+    namespace: istio-ingress
+  virtualService:
+    name: bookinfo-vs
+    namespace: bookinfo
