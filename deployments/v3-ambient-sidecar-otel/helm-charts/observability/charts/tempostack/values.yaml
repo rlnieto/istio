@@ -1,7 +1,8 @@
 minio:
   name: minio
   namespace: tracing-system
-  endpoint: http://papandujo.tia.com:9000
+  # Minio desplegado en el mismo cluster
+  endpoint: http://minio.minio.svc.cluster.local:9000
   bucket: tempo
   access_key_id: adminuser
   access_key_secret: adminuser
