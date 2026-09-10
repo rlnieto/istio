@@ -6,6 +6,8 @@
 :toc:
 :toclevels: 4
 
+image:https://img.shields.io/badge/GitOps-Argo%20CD-blue?logo=argo[Argo CD]
+
 == ToDo
 * Desplegar el waypoint proxy
 
