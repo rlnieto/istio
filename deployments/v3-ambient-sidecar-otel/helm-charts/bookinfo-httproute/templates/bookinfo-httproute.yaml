@@ -1,0 +1,84 @@
+# Nos guardamos los datos del gateway porque dentro del range el
+# contexto cambia al elemento sobre el que iteramos
+{{- $gateway := .Values.bookinfo.gateway }}
+# $key contendra la clave ([sidecar, ambient] y $route datos para cada clave
+{{- range $key, $route := .Values.bookinfo.httpRoute }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ $route.name }}
+  namespace: {{ $route.namespace }}
+spec:
+  parentRefs:
+  - name: {{ $gateway.name }}
+    namespace: {{ $gateway.namespace }}
+  rules:
+    # Añadimos un filtro para eliminar el pathPrefix (se envía tal
+    # cual el path que llega a la petición al servicio destino)
+  - matches:
+    - path:
+        type: PathPrefix
+        value: {{ $route.pathPrefix }}/productpage
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /productpage
+    backendRefs:
+    - name: productpage
+      port: 9080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: {{ $route.pathPrefix }}/static
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /static      
+    backendRefs:
+    - name: productpage
+      port: 9080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: {{ $route.pathPrefix }}/login
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /login
+    backendRefs:
+    - name: productpage
+      port: 9080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: {{ $route.pathPrefix }}/logout
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /logout
+    backendRefs:
+    - name: productpage
+      port: 9080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: {{ $route.pathPrefix }}/api/v1/products
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /api/v1/products
+    backendRefs:
+    - name: productpage
+      port: 9080      
+---
+{{- end }}      

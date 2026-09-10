@@ -1,6 +1,0 @@
-userWorkload:
-  enabled: true
-istio:
-  namespace: istio-system
-kiali:
-  name: kiali

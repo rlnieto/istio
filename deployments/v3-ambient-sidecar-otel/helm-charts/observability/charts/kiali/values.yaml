@@ -1,0 +1,10 @@
+userWorkload:
+  enabled: true
+istio:
+  namespace: istio-system
+kiali:
+  name: kiali
+bookapp:
+  namespaces: 
+  - bookinfo-sidecar
+  - bookinfo-ambient

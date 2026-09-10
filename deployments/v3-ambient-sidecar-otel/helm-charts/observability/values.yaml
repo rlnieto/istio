@@ -1,0 +1,13 @@
+# Subcharts
+kiali:
+  enabled: true
+
+otel-collector:
+  enabled: true
+
+tempo-stack:
+  enabled: true  
+
+# Datos accesibles por todos los subcharts
+#global:
+#  xxx:

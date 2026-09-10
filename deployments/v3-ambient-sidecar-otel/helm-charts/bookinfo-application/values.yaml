@@ -1,0 +1,7 @@
+app:
+  sidecar:
+    name: default
+    namespace: bookinfo-sidecar
+  ambient:
+    name: default
+    namespace: bookinfo-ambient

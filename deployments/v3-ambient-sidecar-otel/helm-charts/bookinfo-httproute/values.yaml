@@ -1,0 +1,13 @@
+bookinfo:
+  gateway:
+    name: istio-ingress
+    namespace: istio-ingress
+  httpRoute:
+    sidecar:
+      name: bookinfo-route
+      namespace: bookinfo-sidecar
+      pathPrefix: "/sidecar"
+    ambient:
+      name: bookinfo-route
+      namespace: bookinfo-ambient
+      pathPrefix: "/ambient"

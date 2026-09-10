@@ -1,0 +1,34 @@
+apiVersion: kiali.io/v1alpha1
+kind: Kiali
+metadata:
+  name: {{ .Values.kiali.name }}
+  namespace: {{ .Values.istio.namespace }}
+spec:
+  version: default
+  external_services:
+    # La propiedad 'tracing' es necesaria para ver las trazas en la consola Kiali
+    tracing:
+      enabled: true
+      provider: tempo
+      use_grpc: true
+      # URL interna accesible por el pod de Kiali para consultar la API de Tempo
+      #internal_url: "http://tempo-<instancia>-gateway.<namespace>:8080/api/traces/v1/<tenant>/tempo"
+      internal_url: tempo-tempo-gateway.tracing-system.svc.cluster.local:8090
+      # URL pública (Grafana / OpenShift Console) para los enlaces de "Ver en interfaz externa"
+      #external_url: "https://grafana-route-openshift-operators.apps.tu-cluster.com"
+      tempo_config:
+        url_format: "openshift" # ["jaeger", "openshift", "grafana"] según la UI donde visualices Tempo
+      # Revisar esto <- se supone que el token de acceso a tempo esta en el secret
+      auth:
+        type: bearer
+        use_kiali_token: true
+#        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+#        token: "secret:tempo-auth-token:token"
+        insecure_skip_verify: true  # Cambia a true solo si estás usando certs autofirmados sin CA configurada
+    prometheus:
+      auth:
+        type: bearer
+        use_kiali_token: true
+      thanos_proxy:
+        enabled: true
+      url: https://thanos-querier.openshift-monitoring.svc.cluster.local:9091

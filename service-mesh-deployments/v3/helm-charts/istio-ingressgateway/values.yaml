@@ -1,4 +1,0 @@
-istioIngressGateway:
-  name: istio-ingressgateway
-  namespace: bookinfo
-  hostname: bookinfo.rabadillo.tia.com
