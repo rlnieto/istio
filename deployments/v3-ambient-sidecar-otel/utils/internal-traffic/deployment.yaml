@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: bookinfo-test
-        image: quay.io/rlnieto/bookinfo-test-multi:1.0.0
+        image: quay.io/rlnieto/bookinfo-test-multi:1.0.2
         imagePullPolicy: Always
         # Por si queremos cambiar el entrypoint
         #command: ["/bin/bash"]
