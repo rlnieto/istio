@@ -6,7 +6,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"  
 spec:
   # Ambient mode enabled
-  profile: ambient
+#  profile: ambient
   namespace: {{ .Values.istio.namespace }}
   # Defines how the operator updates the control plane:
   #   - InPlace (recommended)

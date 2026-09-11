@@ -7,4 +7,4 @@ metadata:
 spec:
   namespace: {{ .Values.istio.cni.namespace }}
   version: {{ .Values.istio.version }}
-  profile: ambient  
+#  profile: ambient  
