@@ -17,7 +17,7 @@ spec:
   values:
     pilot:
       # Ztunnel namespace
-      trustedZtunnelNamespace: {{ .Values.istio.ztunnel.namespace }}
+#      trustedZtunnelNamespace: {{ .Values.istio.ztunnel.namespace }}
       autoscaleEnabled: false
       replicaCount: {{ .Values.istio.pilot.replicas }}
     global:
