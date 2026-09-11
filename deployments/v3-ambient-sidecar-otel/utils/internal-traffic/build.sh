@@ -1,1 +1,1 @@
-podman build -t quay.io/rlnieto/bookinfo-test:1.0.1 .
+podman build -t quay.io/rlnieto/bookinfo-test-multi:1.0.0 .

@@ -3,7 +3,7 @@
 # Genera tráfico en el mesh llamando a los endpoints:
 #   - /productpage
 #   - /api/v1/products
-HOSTNAME=productpage.bookinfo.svc.cluster.local:9080
+HOSTNAME=productpage.bookinfo-sidecar.svc.cluster.local:9080
 iteraciones=0
 
 echo -e "Usando hostname: $HOSTNAME\n"
